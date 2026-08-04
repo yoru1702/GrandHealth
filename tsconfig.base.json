@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+
+    "module": "ESNext",
+
+    "moduleResolution": "Bundler",
+
+    "strict": true,
+
+    "skipLibCheck": true,
+
+    "resolveJsonModule": true,
+
+    "isolatedModules": true,
+
+    "baseUrl": ".",
+
+    "paths": {
+      "@database-types/*": [
+        "packages/database-types/*"
+      ],
+
+      "@shared/*": [
+        "packages/shared/*"
+      ],
+
+      "@ui/*": [
+        "packages/ui/*"
+      ]
+    }
+  }
+}
