@@ -2,19 +2,23 @@
   "name": "grand-health",
   "private": true,
   "version": "1.0.0",
-
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
-
   "scripts": {
-    "dev:staff": "npm run dev --workspace=staff",
-    "dev:liff": "npm run dev --workspace=liff",
-
-    "build:staff": "npm run build --workspace=staff",
-    "build:liff": "npm run build --workspace=liff",
-
-    "lint": "npm run lint --workspaces"
+  "dev:staff": "npm run dev --workspace=staff",
+  "dev:liff": "npm run dev --workspace=liff",
+  "build:staff": "npm run build --workspace=staff",
+  "build:liff": "npm run build --workspace=liff",
+  "lint": "npm run lint --workspaces",
+  "typecheck": "npm run typecheck --workspaces"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.4",
+    "@supabase/supabase-js": "^2.112.0"
+  },
+  "devDependencies": {
+    "supabase": "^2.111.0"
   }
 }
