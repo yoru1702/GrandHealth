@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.18"
   }
   public: {
     Tables: {
@@ -91,13 +91,6 @@ export type Database = {
           status?: Database["public"]["Enums"]["appointment_status_enum"]
         }
         Relationships: [
-          {
-            foreignKeyName: "tb_appointment_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "tb_profile"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "tb_appointment_id_doctor_fkey"
             columns: ["id_doctor"]
@@ -306,13 +299,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "tb_assignment_assigned_by_fkey"
-            columns: ["assigned_by"]
-            isOneToOne: false
-            referencedRelation: "tb_profile"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "tb_assignment_id_doctor_fkey"
             columns: ["id_doctor"]
             isOneToOne: false
@@ -365,15 +351,7 @@ export type Database = {
           target_table?: string | null
           user_agent?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "tb_audit_log_id_profile_fkey"
-            columns: ["id_profile"]
-            isOneToOne: false
-            referencedRelation: "tb_profile"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       tb_chat_consult: {
         Row: {
@@ -415,6 +393,7 @@ export type Database = {
           granted_by: string
           id_consent: number
           id_elderly: number
+          id_relative: number
           revoked_at: string | null
         }
         Insert: {
@@ -424,6 +403,7 @@ export type Database = {
           granted_by: string
           id_consent?: number
           id_elderly: number
+          id_relative: number
           revoked_at?: string | null
         }
         Update: {
@@ -433,15 +413,23 @@ export type Database = {
           granted_by?: string
           id_consent?: number
           id_elderly?: number
+          id_relative?: number
           revoked_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "tb_consent_granted_by_fkey"
+            foreignKeyName: "fk_tb_consent_elderly_relative"
+            columns: ["id_relative", "id_elderly"]
+            isOneToOne: false
+            referencedRelation: "tb_elderly_relative"
+            referencedColumns: ["id_relative", "id_elderly"]
+          },
+          {
+            foreignKeyName: "fk_tb_consent_granted_by"
             columns: ["granted_by"]
             isOneToOne: false
-            referencedRelation: "tb_profile"
-            referencedColumns: ["id"]
+            referencedRelation: "tb_user"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "tb_consent_id_elderly_fkey"
@@ -547,30 +535,30 @@ export type Database = {
           created_at: string
           id_doctor: number
           id_hospital: number
-          id_profile: string
+          staff_id: number
           status: Database["public"]["Enums"]["profile_status_enum"]
         }
         Insert: {
           created_at?: string
           id_doctor?: number
           id_hospital: number
-          id_profile: string
+          staff_id: number
           status?: Database["public"]["Enums"]["profile_status_enum"]
         }
         Update: {
           created_at?: string
           id_doctor?: number
           id_hospital?: number
-          id_profile?: string
+          staff_id?: number
           status?: Database["public"]["Enums"]["profile_status_enum"]
         }
         Relationships: [
           {
-            foreignKeyName: "tb_doctor_id_profile_fkey"
-            columns: ["id_profile"]
+            foreignKeyName: "tb_doctor_staff_fkey"
+            columns: ["staff_id"]
             isOneToOne: true
-            referencedRelation: "tb_profile"
-            referencedColumns: ["id"]
+            referencedRelation: "tb_staff"
+            referencedColumns: ["staff_id"]
           },
         ]
       }
@@ -582,7 +570,7 @@ export type Database = {
           disease: string | null
           gender: Database["public"]["Enums"]["gender_enum"] | null
           id_elderly: number
-          id_profile: string
+          user_id: string
         }
         Insert: {
           address?: string | null
@@ -591,7 +579,7 @@ export type Database = {
           disease?: string | null
           gender?: Database["public"]["Enums"]["gender_enum"] | null
           id_elderly?: number
-          id_profile: string
+          user_id: string
         }
         Update: {
           address?: string | null
@@ -600,59 +588,59 @@ export type Database = {
           disease?: string | null
           gender?: Database["public"]["Enums"]["gender_enum"] | null
           id_elderly?: number
-          id_profile?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "tb_elderly_id_profile_fkey"
-            columns: ["id_profile"]
+            foreignKeyName: "tb_elderly_user_fkey"
+            columns: ["user_id"]
             isOneToOne: true
-            referencedRelation: "tb_profile"
-            referencedColumns: ["id"]
+            referencedRelation: "tb_user"
+            referencedColumns: ["user_id"]
           },
         ]
       }
       tb_elderly_relative: {
         Row: {
           approved_at: string | null
-          approved_by: string | null
+          approved_by_user_id: string | null
           consent_health_data: boolean
           id_elderly: number
-          id_profile: string
           id_relative: number
           relation: Database["public"]["Enums"]["relative_relation_enum"]
+          relative_user_id: string
           request_at: string
           status: Database["public"]["Enums"]["relative_status_enum"]
         }
         Insert: {
           approved_at?: string | null
-          approved_by?: string | null
+          approved_by_user_id?: string | null
           consent_health_data?: boolean
           id_elderly: number
-          id_profile: string
           id_relative?: number
           relation: Database["public"]["Enums"]["relative_relation_enum"]
+          relative_user_id: string
           request_at?: string
           status?: Database["public"]["Enums"]["relative_status_enum"]
         }
         Update: {
           approved_at?: string | null
-          approved_by?: string | null
+          approved_by_user_id?: string | null
           consent_health_data?: boolean
           id_elderly?: number
-          id_profile?: string
           id_relative?: number
           relation?: Database["public"]["Enums"]["relative_relation_enum"]
+          relative_user_id?: string
           request_at?: string
           status?: Database["public"]["Enums"]["relative_status_enum"]
         }
         Relationships: [
           {
-            foreignKeyName: "tb_elderly_relative_approved_by_fkey"
-            columns: ["approved_by"]
+            foreignKeyName: "tb_elderly_relative_approved_by_user_fkey"
+            columns: ["approved_by_user_id"]
             isOneToOne: false
-            referencedRelation: "tb_profile"
-            referencedColumns: ["id"]
+            referencedRelation: "tb_user"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "tb_elderly_relative_id_elderly_fkey"
@@ -662,11 +650,11 @@ export type Database = {
             referencedColumns: ["id_elderly"]
           },
           {
-            foreignKeyName: "tb_elderly_relative_id_profile_fkey"
-            columns: ["id_profile"]
+            foreignKeyName: "tb_elderly_relative_relative_user_fkey"
+            columns: ["relative_user_id"]
             isOneToOne: false
-            referencedRelation: "tb_profile"
-            referencedColumns: ["id"]
+            referencedRelation: "tb_user"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -718,13 +706,6 @@ export type Database = {
             referencedRelation: "tb_elderly"
             referencedColumns: ["id_elderly"]
           },
-          {
-            foreignKeyName: "tb_emergency_reported_by_fkey"
-            columns: ["reported_by"]
-            isOneToOne: false
-            referencedRelation: "tb_profile"
-            referencedColumns: ["id"]
-          },
         ]
       }
       tb_emergency_relative: {
@@ -763,13 +744,6 @@ export type Database = {
             referencedRelation: "tb_emergency"
             referencedColumns: ["id_emergency"]
           },
-          {
-            foreignKeyName: "tb_emergency_relative_id_profile_fkey"
-            columns: ["id_profile"]
-            isOneToOne: false
-            referencedRelation: "tb_profile"
-            referencedColumns: ["id"]
-          },
         ]
       }
       tb_geo: {
@@ -800,7 +774,6 @@ export type Database = {
           height: number | null
           id_elderly: number
           id_health: number
-          llm_summary: string | null
           recorded_by: string | null
           sys: number
           weight: number | null
@@ -817,7 +790,6 @@ export type Database = {
           height?: number | null
           id_elderly: number
           id_health?: number
-          llm_summary?: string | null
           recorded_by?: string | null
           sys: number
           weight?: number | null
@@ -834,7 +806,6 @@ export type Database = {
           height?: number | null
           id_elderly?: number
           id_health?: number
-          llm_summary?: string | null
           recorded_by?: string | null
           sys?: number
           weight?: number | null
@@ -846,13 +817,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "tb_elderly"
             referencedColumns: ["id_elderly"]
-          },
-          {
-            foreignKeyName: "tb_health_record_recorded_by_fkey"
-            columns: ["recorded_by"]
-            isOneToOne: false
-            referencedRelation: "tb_profile"
-            referencedColumns: ["id"]
           },
         ]
       }
@@ -905,54 +869,44 @@ export type Database = {
       }
       tb_profile: {
         Row: {
-          auth_channel: Database["public"]["Enums"]["auth_channel_enum"]
-          citizen_id: string | null
+          connected_at: string | null
           created_at: string
-          email: string | null
-          id: string
-          id_hospital: number | null
           line_display_name: string | null
           line_picture_url: string | null
           line_user_id: string | null
-          name: string
-          role: Database["public"]["Enums"]["role_enum"]
           status: Database["public"]["Enums"]["profile_status_enum"]
-          surname: string
-          tel: string | null
+          updated_at: string
+          user_id: string
         }
         Insert: {
-          auth_channel: Database["public"]["Enums"]["auth_channel_enum"]
-          citizen_id?: string | null
+          connected_at?: string | null
           created_at?: string
-          email?: string | null
-          id: string
-          id_hospital?: number | null
           line_display_name?: string | null
           line_picture_url?: string | null
           line_user_id?: string | null
-          name: string
-          role?: Database["public"]["Enums"]["role_enum"]
           status?: Database["public"]["Enums"]["profile_status_enum"]
-          surname: string
-          tel?: string | null
+          updated_at?: string
+          user_id: string
         }
         Update: {
-          auth_channel?: Database["public"]["Enums"]["auth_channel_enum"]
-          citizen_id?: string | null
+          connected_at?: string | null
           created_at?: string
-          email?: string | null
-          id?: string
-          id_hospital?: number | null
           line_display_name?: string | null
           line_picture_url?: string | null
           line_user_id?: string | null
-          name?: string
-          role?: Database["public"]["Enums"]["role_enum"]
           status?: Database["public"]["Enums"]["profile_status_enum"]
-          surname?: string
-          tel?: string | null
+          updated_at?: string
+          user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tb_profile_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "tb_user"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       tb_province: {
         Row: {
@@ -1027,6 +981,48 @@ export type Database = {
           },
         ]
       }
+      tb_staff: {
+        Row: {
+          created_at: string
+          id_hospital: number
+          role: Database["public"]["Enums"]["system_role_enum"]
+          staff_id: number
+          status: Database["public"]["Enums"]["status_active_enum"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id_hospital: number
+          role: Database["public"]["Enums"]["system_role_enum"]
+          staff_id?: number
+          status?: Database["public"]["Enums"]["status_active_enum"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id_hospital?: number
+          role?: Database["public"]["Enums"]["system_role_enum"]
+          staff_id?: number
+          status?: Database["public"]["Enums"]["status_active_enum"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tb_staff_hospital_fkey"
+            columns: ["id_hospital"]
+            isOneToOne: false
+            referencedRelation: "tb_hospital"
+            referencedColumns: ["id_hospital"]
+          },
+          {
+            foreignKeyName: "tb_staff_user_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "tb_user"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       tb_subdistrict: {
         Row: {
           created_at: string | null
@@ -1074,6 +1070,42 @@ export type Database = {
           },
         ]
       }
+      tb_user: {
+        Row: {
+          citizen_id: string | null
+          created_at: string
+          email: string | null
+          name: string
+          status: Database["public"]["Enums"]["status_active_enum"]
+          surname: string
+          tel: string | null
+          user_id: string
+          user_type: Database["public"]["Enums"]["user_type_enum"] | null
+        }
+        Insert: {
+          citizen_id?: string | null
+          created_at?: string
+          email?: string | null
+          name: string
+          status?: Database["public"]["Enums"]["status_active_enum"]
+          surname: string
+          tel?: string | null
+          user_id: string
+          user_type?: Database["public"]["Enums"]["user_type_enum"] | null
+        }
+        Update: {
+          citizen_id?: string | null
+          created_at?: string
+          email?: string | null
+          name?: string
+          status?: Database["public"]["Enums"]["status_active_enum"]
+          surname?: string
+          tel?: string | null
+          user_id?: string
+          user_type?: Database["public"]["Enums"]["user_type_enum"] | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1095,13 +1127,18 @@ export type Database = {
         | "HT_GRADE_1"
         | "HT_GRADE_2"
         | "HT_GRADE_3"
-      consent_type_enum: "SHARE_TO_RELATIVE"
+      consent_type_enum:
+        | "SHARE_TO_RELATIVE"
+        | "VIEW_HEALTH_RECORD"
+        | "VIEW_ASSESSMENT_RESULT"
+        | "VIEW_APPOINTMENT"
+        | "VIEW_EMERGENCY"
       consult_status_enum: "ACTIVE" | "CLOSED"
       emergency_status_enum: "ACTIVE" | "REFERRING" | "CLOSED"
       emergency_trigger_type_enum: "MANUAL" | "AUTO_BP"
       entry_channel_enum: "SELF" | "ASSISTED"
       gender_enum: "M" | "F"
-      notify_channel_enum: "LINE" | "SMS"
+      notify_channel_enum: "LINE" | "EMAIL"
       notify_status_enum: "SENT" | "READ" | "FAILED"
       profile_status_enum: "ACTIVE" | "INACTIVE"
       relative_relation_enum:
@@ -1111,14 +1148,10 @@ export type Database = {
         | "SPOUSE"
         | "RELATIVE"
       relative_status_enum: "PENDING" | "APPROVED" | "REJECTED"
-      role_enum:
-        | "SYSTEM_ADMIN"
-        | "HOSPITAL_OFFICER"
-        | "DOCTOR"
-        | "ELDERLY"
-        | "RELATIVE"
       sender_role_enum: "elderly" | "doctor"
       status_active_enum: "ACTIVE" | "INACTIVE"
+      system_role_enum: "SYSTEM_ADMIN" | "HOSPITAL_OFFICER" | "DOCTOR"
+      user_type_enum: "ELDERLY" | "RELATIVE"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1134,12 +1167,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1163,11 +1196,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1188,11 +1221,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1213,11 +1246,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1230,11 +1263,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1260,13 +1293,19 @@ export const Constants = {
         "HT_GRADE_2",
         "HT_GRADE_3",
       ],
-      consent_type_enum: ["SHARE_TO_RELATIVE"],
+      consent_type_enum: [
+        "SHARE_TO_RELATIVE",
+        "VIEW_HEALTH_RECORD",
+        "VIEW_ASSESSMENT_RESULT",
+        "VIEW_APPOINTMENT",
+        "VIEW_EMERGENCY",
+      ],
       consult_status_enum: ["ACTIVE", "CLOSED"],
       emergency_status_enum: ["ACTIVE", "REFERRING", "CLOSED"],
       emergency_trigger_type_enum: ["MANUAL", "AUTO_BP"],
       entry_channel_enum: ["SELF", "ASSISTED"],
       gender_enum: ["M", "F"],
-      notify_channel_enum: ["LINE", "SMS"],
+      notify_channel_enum: ["LINE", "EMAIL"],
       notify_status_enum: ["SENT", "READ", "FAILED"],
       profile_status_enum: ["ACTIVE", "INACTIVE"],
       relative_relation_enum: [
@@ -1277,15 +1316,10 @@ export const Constants = {
         "RELATIVE",
       ],
       relative_status_enum: ["PENDING", "APPROVED", "REJECTED"],
-      role_enum: [
-        "SYSTEM_ADMIN",
-        "HOSPITAL_OFFICER",
-        "DOCTOR",
-        "ELDERLY",
-        "RELATIVE",
-      ],
       sender_role_enum: ["elderly", "doctor"],
       status_active_enum: ["ACTIVE", "INACTIVE"],
+      system_role_enum: ["SYSTEM_ADMIN", "HOSPITAL_OFFICER", "DOCTOR"],
+      user_type_enum: ["ELDERLY", "RELATIVE"],
     },
   },
 } as const
